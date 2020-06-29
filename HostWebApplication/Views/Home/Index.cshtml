@@ -1,0 +1,70 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+
+
+<meta name="importmap-type" content="systemjs-importmap">
+<script type="systemjs-importmap">
+    {
+    "imports": {
+    "app1": "http://localhost:5555/main.js",
+    "app2": "http://localhost:4202/main.js",
+    "single-spa": "https://cdnjs.cloudflare.com/ajax/libs/single-spa/5.5.0/system/single-spa.min.js",
+    "single-spa-layout": "https://unpkg.com/single-spa-layout@1.0.0-beta.2/dist/system/single-spa-layout.min.js"
+    }
+    }
+</script>
+<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/single-spa/5.5.0/system/single-spa.min.js" as="script" crossorigin="anonymous" />
+<script src='https://unpkg.com/core-js-bundle@3.1.4/minified.js'></script>
+<script src="https://unpkg.com/zone.js"></script>
+<script src="https://unpkg.com/import-map-overrides@1.15.1/dist/import-map-overrides.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/4.0.0/system.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/4.0.0/extras/amd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/4.0.0/extras/named-exports.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/4.0.0/extras/named-register.min.js"></script>
+
+<script>
+    Promise.all([System.import('single-spa'), System.import('single-spa-layout')]).then(([singleSpa, singleSpaLayout]) => {
+        const { constructApplications, constructLayoutEngine, constructRoutes } = singleSpaLayout;
+        const { registerApplication, start } = singleSpa;
+
+        const routes = constructRoutes(document.querySelector('#single-spa-layout'));
+        const applications = constructApplications({
+            routes,
+            loadApp({ name }) {
+                return System.import(name);
+            },
+        });
+        const layoutEngine = constructLayoutEngine({ routes, applications });
+        applications.forEach(registerApplication);
+
+        start();
+    });
+
+    localStorage.setItem("userName", "Thales Reis");
+</script>
+
+
+<div class="text-center">
+    <template id="single-spa-layout">
+        <single-spa-router>
+            <div class="card">
+                <div class="card-header">
+                    Meu App A
+                </div>
+                <div class="card-body">
+                    <application name="app1"></application>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    Meu App B
+                </div>
+                <div class="card-body">
+                    <application name="app2"></application>
+                </div>
+            </div>
+        </single-spa-router>
+    </template>
+</div>
